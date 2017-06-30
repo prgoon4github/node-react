@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Create Comment</h1>
+    <form action="/api/comment" method="post" >  <!-- Most important in rest calls are resource-->
+      <input type="text" name ="username" placeholder="Name" /> <br />
+      <input type="text" name ="body" placeholder="Comments" />
+      <br />
+      <input type="submit" value="Create Comment" />
+    </form>
+</body>
+</html>
