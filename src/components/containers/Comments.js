@@ -1,52 +1,57 @@
 import React, { Component } from 'react'
-import Comment from '../presentation/Comment'
+import { CreateComment, Comment } from '../presentation'
 import styles from './styles'
-import superagent from 'superagent'
+import{ APIManager } from '../../utils'
 
 
 class Comments extends Component{
   constructor(){
     super()
     this.state = {
-      comment: {
+  /*    comment: {
         username: '',
-        body: '',
-        timestamp: ''
+        body: ''
       },
-      list:[]
+  */    list:[]
     }
   }
   componentDidMount(){
     console.log('componentDidMount')
-    superagent
-    .get('/api/comment')
-    .query(null)
-    .set('Accept', 'application/json')
-    .end((err, response) =>{
-     if(err){
-       alert('Error: '+err)
-       retrun
-     }
-     console.log(JSON.stringify(response.body))
-     let results = response.body.results
-     let updatedList = Object.assign([], this.state.list)
-     this.setState({
-       list: results
-     })
+    APIManager.get('/api/comment', null, (err,response) => {
+      if(err){
+        alert('ERROR : '+err.message)
+        return
+      }
+      console.log('RESULTS: '+ JSON.stringify(response.results))
+      this.setState({
+        list: response.results
+      })
     })
   }
 
 
-  submitComment(){
-//    console.log('submitAction '+JSON.stringify(this.state.comment))
-    let updatedList = Object.assign([], this.state.list)
-    updatedList.push(this.state.comment);
-    this.setState({
-      list: updatedList
+  submitComment(comment){
+    console.log('submitAction in Comments.js: '+JSON.stringify(comment))
+
+//    let updatedComment = Object.assign({}, this.state.comment)
+    let updatedComment = Object.assign({}, comment)
+
+    APIManager.post('/api/comment', updatedComment, (err, response) =>{
+      if(err){
+        alert('ERROR : '+err.message)
+        return
+      }
+      console.log('COMMENT CREATED: '+JSON.stringify(response))
+      let updatedList = Object.assign([], this.state.list)
+      updatedList.push(response.result)
+      this.setState({
+        list: updatedList
+      })
     })
   }
+/*
   updateUsername(event){
-//    console.log('updateUsernameAction '+event.target.value)
+    console.log('updateUsernameAction '+event.target.value)
     //WRONG WAY BELOW - As it fails to comply the rule "NEVER MUTATE A STATE"
     //this.state.comment['username'] = event.target.value
     //RIGHT WAY - create a copy, update the copy and then reset the state
@@ -64,16 +69,17 @@ class Comments extends Component{
       comment:updatedComment
     })
   }
-
+*/
+/*
   updateTimestamp(event){
-//    console.log('updateTimestamp '+event.target.value)
+    console.log('updateTimestamp '+event.target.value)
     let updatedComment = Object.assign({}, this.state.comment)
     updatedComment['timestamp'] = event.target.value
     this.setState({
       comment:updatedComment
     })
   }
-
+*/
 
   render(){
     const commentStyle = styles.comment
@@ -93,11 +99,7 @@ class Comments extends Component{
               <ul style={commentStyle.commentsList}>
                 { commentList }
               </ul>
-
-              <input onChange={this.updateUsername.bind(this)} className="form-control" type="text" placeholder="Username"/>
-              <input onChange={this.updateBody.bind(this)} className="form-control" type="text" placeholder="Comments"/>
-              <input onChange={this.updateTimestamp.bind(this)} className="form-control" type="text" placeholder="Timestamp (e.g. 10:30)"/><br />
-              <button onClick={this.submitComment.bind(this)} className="btn btn-info">Submit Comment</button>
+                <CreateComment onCreate={this.submitComment.bind(this)}/>
               </div>
             </div>
           )
