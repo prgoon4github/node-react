@@ -1,15 +1,12 @@
 import React, { Component } from 'react'
-import Zone from '../presentation/Zone'
+import {Zone,CreateZone} from '../presentation'
 import{ APIManager } from '../../utils'
 
  class Zones extends Component{
    constructor(){
      super()
      this.state = {
-       zone:{
-         name: '',
-         zipCode: ''
-       },
+       selected: 0,
        list:[]
      }
    }
@@ -26,7 +23,7 @@ import{ APIManager } from '../../utils'
        })
      })
    }
-   updateZone(event){
+/*   updateZone(event){
      console.log(event.target.id +":"  + event.target.value);
      let updatedZone = Object.assign({}, this.state.zone)
      updatedZone[event.target.id] = event.target.value
@@ -34,11 +31,12 @@ import{ APIManager } from '../../utils'
        zone: updatedZone
      })
    }
-   addZone(){
-     console.log('addZone :'+JSON.stringify(this.state.zone))
-     let updatedZone = Object.assign({}, this.state.zone)
-     updatedZone['zipCodes'] = updatedZone.zipCode.split(',')
-     console.log('updatedZone :'+JSON.stringify(updatedZone))
+*/
+   addZone(zone){
+     console.log('addZone in Zones.js:'+JSON.stringify(zone))
+     let updatedZone = Object.assign({}, zone)
+//     updatedZone['zipCodes'] = updatedZone.zipCode.split(',')
+//     console.log('updatedZone :'+JSON.stringify(updatedZone))
 
      APIManager.post('/api/zone',updatedZone,(err,response) =>{
        if(err){
@@ -55,12 +53,19 @@ import{ APIManager } from '../../utils'
     })
    }
 
+   selectZone(index){
+     console.log('selectZone in container, index: '+index)
+     this.setState({
+          selected: index
+     })
+   }
 
    render(){
      const listItems = this.state.list.map((zone, i) => {
+     let selected = (i==this.state.selected)
        return(
          <li key={i}>
-             <Zone currentZone={zone}/>
+             <Zone index={i} select={this.selectZone.bind(this)} isSelected={selected} currentZone={zone}/>
          </li>
        )
      })
@@ -69,10 +74,7 @@ import{ APIManager } from '../../utils'
           <ol>
             {listItems}
           </ol>
-          <input id="name" onChange={this.updateZone.bind(this)} className="form-control" type="text" placeholder="Zone"/>
-          <input id="zipCode" onChange={this.updateZone.bind(this)} className="form-control" type="text" placeholder="Zip"/>
-          <button onClick={this.addZone.bind(this)} className="btn btn-danger">Add Zone</button>
-
+          <CreateZone onCreate={this.addZone.bind(this)}/>
       </div>
      )
    }

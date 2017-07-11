@@ -5,8 +5,6 @@ class CreateComment extends Component{
     super()
     this.state={
       comment: {
-          username: '',
-          body: ''
       }
     }
   }
